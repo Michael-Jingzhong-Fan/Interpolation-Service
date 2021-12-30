@@ -1,0 +1,22 @@
+local InterpolationService = require(script.Parent.Parent)
+local Services = InterpolationService.Services
+local Variables = InterpolationService.Variables
+local Constants = InterpolationService.Constants
+
+return function(InterpolationId, SuppressPreInterpolation)
+	if InterpolationId == nil then return end
+	if SuppressPreInterpolation == false then
+		local Success = pcall(function()
+			for i = 1, #Variables.Interpolations[InterpolationId]["PreInterpolationCallbacks"] do
+				Variables.Interpolations[InterpolationId]["PreInterpolationCallbacks"][i]()
+			end
+		end)
+		if Success == false then print("Failed PreInterpolationCallbacks or none declared") end
+	end
+	pcall(function()
+		local RefreshRate = Variables.Interpolations[InterpolationId]["RefreshRate"]
+		table.insert(Variables.RefreshRates[RefreshRate], InterpolationId)
+		Variables.ActiveInterpolations[InterpolationId] = Variables.Interpolations[InterpolationId]
+		Variables.ActiveInterpolations[InterpolationId]["RefreshRate"] = nil
+	end)
+end
